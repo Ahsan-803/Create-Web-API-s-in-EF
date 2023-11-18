@@ -1,0 +1,110 @@
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Cors;
+using System.Web.Mvc;
+
+namespace WebApi0.Controllers
+{
+    [System.Web.Http.RoutePrefix("api/webApi")]
+    [EnableCors("*","*","*")]
+    public class WebApiController : ApiController
+    {
+        WebApiDbEntities Db = new WebApiDbEntities(); 
+
+        [System.Web.Http.HttpGet]
+        [System.Web.Http.Route("GetData")]
+        public IHttpActionResult GetData()
+        {
+            List<TblUser> list = Db.TblUsers.ToList();
+            return Ok(list);
+        }
+
+        [System.Web.Http.HttpPost]
+        [System.Web.Http.Route("Insert")]
+
+        public IHttpActionResult Insert(TblUser user) 
+        {
+            if(user != null)
+            {
+                Db.TblUsers.Add(user);
+                Db.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("User not added..!");
+            }
+            
+        }
+
+        [System.Web.Http.HttpGet]
+        [System.Web.Http.Route("Put1")]
+        public IHttpActionResult Put1(int id)
+        {
+            TblUser user = Db.TblUsers.Find(id);
+            if(user != null)
+            {
+                return Ok(user);
+            }
+            else
+            {
+                return BadRequest("User not found..!");
+            }
+        }
+
+
+        [System.Web.Http.HttpPut]
+        [System.Web.Http.Route("Put")]
+        public IHttpActionResult Put(TblUser user) 
+        {
+            //var check = Db.TblUsers.Where(model => model.UserId == user.UserId).FirstOrDefault();
+            if(user != null)
+            {
+                Db.Entry(user).State = EntityState.Modified;
+                Db.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("User not update..!");
+            }
+        }
+
+        [System.Web.Http.HttpDelete]
+        [System.Web.Http.Route("Remove")]
+        public IHttpActionResult Remove(int id)
+        {
+            var check = Db.TblUsers.Where(model => model.UserId == id).FirstOrDefault();
+            if (check != null)
+            {
+                Db.TblUsers.Remove(check);
+                Db.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("User not delete..!");
+            }
+        }
+
+        [System.Web.Http.Route("AllDetail")]
+        [System.Web.Http.HttpGet]
+        public IHttpActionResult AllDetail(int id)
+        {
+            var check = Db.TblUsers.Where(model => model.UserId == id).SingleOrDefault();
+            if (check != null)
+            {
+                return Ok(check);
+            }
+            else
+            {
+                return BadRequest("User details not found..!");
+            }
+        }
+    }
+}
